@@ -1,0 +1,22 @@
+---
+- name: Create ops user
+  ansible.builtin.user:
+    name: ops
+    shell: /bin/bash
+    create_home: true
+    groups: sudo
+    append: true
+
+- name: Allow ops user passwordless sudo
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/ops
+    line: 'ops ALL=(ALL) NOPASSWD:ALL'
+    create: true
+    mode: '0440'
+    validate: 'visudo -cf %s'
+
+- name: Deploy SSH key for ops user
+  ansible.posix.authorized_key:
+    user: ops
+    key: "{{ lookup('file', '~/.ssh/wolverine_key.pub') }}"
+    state: present

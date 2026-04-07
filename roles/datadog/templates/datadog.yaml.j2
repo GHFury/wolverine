@@ -1,0 +1,10 @@
+api_key: {{ datadog_api_key }}
+site: {{ datadog_site }}
+
+logs_enabled: {{ datadog_logs_enabled | lower }}
+process_config:
+  process_collection:
+    enabled: {{ datadog_process_enabled | lower }}
+
+apm_config:
+  enabled: {{ datadog_apm_enabled | lower }}

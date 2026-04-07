@@ -1,0 +1,11 @@
+---
+- name: Configure servers
+  hosts: servers
+  become: true
+
+  roles:
+    - common
+    - users
+    - security
+    - docker
+    - datadog

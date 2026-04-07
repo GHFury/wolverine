@@ -1,0 +1,22 @@
+services:
+  server1:
+    build:
+      context: ./docker
+    container_name: wolverine-server1
+    ports:
+      - "2221:22"
+    networks:
+      - ansible-net
+
+  server2:
+    build:
+      context: ./docker
+    container_name: wolverine-server2
+    ports:
+      - "2222:22"
+    networks:
+      - ansible-net
+
+networks:
+  ansible-net:
+    driver: bridge

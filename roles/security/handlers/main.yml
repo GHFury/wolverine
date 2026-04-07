@@ -1,0 +1,4 @@
+---
+- name: Restart SSH
+  ansible.builtin.shell:
+    cmd: kill -HUP $(cat /var/run/sshd.pid)

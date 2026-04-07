@@ -1,0 +1,57 @@
+---
+- name: Install security packages
+  ansible.builtin.apt:
+    name:
+      - ufw
+      - fail2ban
+    state: present
+
+- name: Configure SSH - disable root login
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PermitRootLogin'
+    line: 'PermitRootLogin no'
+  notify: Restart SSH
+
+- name: Configure SSH - disable password authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+  notify: Restart SSH
+
+- name: Configure SSH - set max auth tries
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?MaxAuthTries'
+    line: 'MaxAuthTries 3'
+  notify: Restart SSH
+
+- name: Check if running in container
+  ansible.builtin.stat:
+    path: /.dockerenv
+  register: dockerenv
+
+- name: Configure UFW - allow SSH
+  community.general.ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
+  when: not dockerenv.stat.exists
+
+- name: Configure UFW - default deny incoming
+  community.general.ufw:
+    default: deny
+    direction: incoming
+  when: not dockerenv.stat.exists
+
+- name: Configure UFW - default allow outgoing
+  community.general.ufw:
+    default: allow
+    direction: outgoing
+  when: not dockerenv.stat.exists
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+  when: not dockerenv.stat.exists
